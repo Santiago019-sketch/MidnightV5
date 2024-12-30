@@ -67,6 +67,13 @@ end
 addButtonCorners(autoFarmBtn)
 addButtonCorners(autoRebirthBtn)
 
+-- Function to simulate clicking
+local function click()
+    game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 1)
+    wait()
+    game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, game, 1)
+end
+
 -- Button Functionality
 local autoFarmEnabled = false
 autoFarmBtn.MouseButton1Click:Connect(function()
@@ -75,16 +82,20 @@ autoFarmBtn.MouseButton1Click:Connect(function()
     autoFarmBtn.Text = autoFarmEnabled and "Auto Farm (ON)" or "Auto Farm"
     
     if autoFarmEnabled then
-        game:GetService("ReplicatedStorage").Common.Library.Network.RemoteEvent:FireServer("S_Tools_Toggle", {[1] = "Punch"})
+        -- Equip fist
+        local args = {
+            [1] = "S_Tools_Equip",
+            [2] = {
+                [1] = "Punch"
+            }
+        }
+        game:GetService("ReplicatedStorage").Common.Library.Network.RemoteEvent:FireServer(unpack(args))
     end
     
+    -- Autoclicker loop
     while autoFarmEnabled do
-        game:GetService("ReplicatedStorage").Common.Library.Network.RemoteEvent:FireServer("S_Tools_Action", {[1] = "Punch"})
+        click()
         wait()
-    end
-    
-    if not autoFarmEnabled then
-        game:GetService("ReplicatedStorage").Common.Library.Network.RemoteEvent:FireServer("S_Tools_Toggle", {[1] = "Punch"})
     end
 end)
 
