@@ -1,110 +1,101 @@
--- Protection bypass
-local G = getfenv(0)
-local Bypass = G.coroutine.wrap(function() 
-    local CoreGui = game:GetService("CoreGui")
-    if not CoreGui:FindFirstChild("Autopunch & Autorebirth GUI") then
-        -- Create GUI
-        local gui = Instance.new("ScreenGui")
-        local frame = Instance.new("Frame")
-        local punchButton = Instance.new("TextButton")
-        local rebirthButton = Instance.new("TextButton")
+local gui = Instance.new("ScreenGui")
+local mainFrame = Instance.new("Frame")
+local autoFarmBtn = Instance.new("TextButton")
+local autoRebirthBtn = Instance.new("TextButton")
+local title = Instance.new("TextLabel")
 
-        -- GUI setup
-        gui.Name = "Autopunch & Autorebirth GUI"
-        gui.ResetOnSpawn = false -- Prevents GUI from disappearing when player respawns
+-- GUI Setup
+gui.Name = "FarmingGUI"
+gui.ResetOnSpawn = false
+gui.Parent = game.CoreGui
 
-        -- Frame styling
-        frame.Parent = gui
-        frame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-        frame.BorderSizePixel = 0
-        frame.Size = UDim2.new(0, 200, 0, 150)
-        frame.Position = UDim2.new(0.8, 0, 0.5, -75)
-        frame.Active = true
-        frame.Draggable = true
+-- Main Frame
+mainFrame.Name = "MainFrame"
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.BorderSizePixel = 0
+mainFrame.Position = UDim2.new(0.8, 0, 0.5, -75)
+mainFrame.Size = UDim2.new(0, 180, 0, 140)
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = gui
 
-        -- Create corner radius
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 8)
-        corner.Parent = frame
+-- Add rounded corners
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = mainFrame
 
-        -- Punch button styling
-        punchButton.Parent = frame
-        punchButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-        punchButton.Size = UDim2.new(0.9, 0, 0, 40)
-        punchButton.Position = UDim2.new(0.05, 0, 0.1, 0)
-        punchButton.Text = "Autopunch"
-        punchButton.TextColor3 = Color3.new(1, 1, 1)
-        punchButton.TextSize = 20
-        punchButton.Font = Enum.Font.GothamBold
+-- Title
+title.Name = "Title"
+title.BackgroundTransparency = 1
+title.Position = UDim2.new(0, 0, 0, 5)
+title.Size = UDim2.new(1, 0, 0, 25)
+title.Font = Enum.Font.GothamBold
+title.Text = "Farming GUI"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextSize = 16
+title.Parent = mainFrame
 
-        -- Add corner radius to punch button
-        local punchCorner = Instance.new("UICorner")
-        punchCorner.CornerRadius = UDim.new(0, 6)
-        punchCorner.Parent = punchButton
+-- Auto Farm Button
+autoFarmBtn.Name = "AutoFarmButton"
+autoFarmBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+autoFarmBtn.Position = UDim2.new(0.1, 0, 0.3, 0)
+autoFarmBtn.Size = UDim2.new(0.8, 0, 0, 35)
+autoFarmBtn.Font = Enum.Font.GothamSemibold
+autoFarmBtn.Text = "Auto Farm"
+autoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+autoFarmBtn.TextSize = 14
+autoFarmBtn.Parent = mainFrame
 
-        -- Rebirth button styling
-        rebirthButton.Parent = frame
-        rebirthButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-        rebirthButton.Size = UDim2.new(0.9, 0, 0, 40)
-        rebirthButton.Position = UDim2.new(0.05, 0, 0.6, 0)
-        rebirthButton.Text = "Autorebirth"
-        rebirthButton.TextColor3 = Color3.new(1, 1, 1)
-        rebirthButton.TextSize = 20
-        rebirthButton.Font = Enum.Font.GothamBold
+-- Auto Rebirth Button
+autoRebirthBtn.Name = "AutoRebirthButton"
+autoRebirthBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+autoRebirthBtn.Position = UDim2.new(0.1, 0, 0.65, 0)
+autoRebirthBtn.Size = UDim2.new(0.8, 0, 0, 35)
+autoRebirthBtn.Font = Enum.Font.GothamSemibold
+autoRebirthBtn.Text = "Auto Rebirth"
+autoRebirthBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+autoRebirthBtn.TextSize = 14
+autoRebirthBtn.Parent = mainFrame
 
-        -- Add corner radius to rebirth button
-        local rebirthCorner = Instance.new("UICorner")
-        rebirthCorner.CornerRadius = UDim.new(0, 6)
-        rebirthCorner.Parent = rebirthButton
+-- Add rounded corners to buttons
+local function addButtonCorners(button)
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 6)
+    corner.Parent = button
+end
 
-        -- Toggle states
-        local punchEnabled = false
-        local rebirthEnabled = false
+addButtonCorners(autoFarmBtn)
+addButtonCorners(autoRebirthBtn)
 
-        -- Button functionality
-        punchButton.MouseButton1Click:Connect(function()
-            punchEnabled = not punchEnabled
-            punchButton.BackgroundColor3 = punchEnabled and Color3.fromRGB(0, 255, 127) or Color3.fromRGB(0, 170, 255)
-            punchButton.Text = punchEnabled and "Autopunch (ON)" or "Autopunch"
-            
-            while punchEnabled do
-                local args = {
-                    [1] = "S_Tools_Toggle",
-                    [2] = {
-                        [1] = "Punch"
-                    }
-                }
-                game:GetService("ReplicatedStorage").Common.Library.Network.RemoteEvent:FireServer(unpack(args))
-                wait(0.1)
-            end
-        end)
-
-        rebirthButton.MouseButton1Click:Connect(function()
-            rebirthEnabled = not rebirthEnabled
-            rebirthButton.BackgroundColor3 = rebirthEnabled and Color3.fromRGB(0, 255, 127) or Color3.fromRGB(0, 170, 255)
-            rebirthButton.Text = rebirthEnabled and "Autorebirth (ON)" or "Autorebirth"
-            
-            while rebirthEnabled do
-                local args = {
-                    [1] = "S_Rebirth_Request",
-                    [2] = {}
-                }
-                game:GetService("ReplicatedStorage").Common.Library.Network.RemoteFunction:InvokeServer(unpack(args))
-                wait(0.1)
-            end
-        end)
-
-        -- Try different methods to parent the GUI
-        local success, err = pcall(function()
-            gui.Parent = game:GetService("CoreGui")
-        end)
-        
-        if not success then
-            pcall(function()
-                gui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-            end)
-        end
+-- Button Functionality
+local autoFarmEnabled = false
+autoFarmBtn.MouseButton1Click:Connect(function()
+    autoFarmEnabled = not autoFarmEnabled
+    autoFarmBtn.BackgroundColor3 = autoFarmEnabled and Color3.fromRGB(0, 170, 127) or Color3.fromRGB(45, 45, 45)
+    autoFarmBtn.Text = autoFarmEnabled and "Auto Farm (ON)" or "Auto Farm"
+    
+    if autoFarmEnabled then
+        game:GetService("ReplicatedStorage").Common.Library.Network.RemoteEvent:FireServer("S_Tools_Toggle", {[1] = "Punch"})
+    end
+    
+    while autoFarmEnabled do
+        game:GetService("ReplicatedStorage").Common.Library.Network.RemoteEvent:FireServer("S_Tools_Action", {[1] = "Punch"})
+        wait()
+    end
+    
+    if not autoFarmEnabled then
+        game:GetService("ReplicatedStorage").Common.Library.Network.RemoteEvent:FireServer("S_Tools_Toggle", {[1] = "Punch"})
     end
 end)
 
-Bypass()
+local autoRebirthEnabled = false
+autoRebirthBtn.MouseButton1Click:Connect(function()
+    autoRebirthEnabled = not autoRebirthEnabled
+    autoRebirthBtn.BackgroundColor3 = autoRebirthEnabled and Color3.fromRGB(0, 170, 127) or Color3.fromRGB(45, 45, 45)
+    autoRebirthBtn.Text = autoRebirthEnabled and "Auto Rebirth (ON)" or "Auto Rebirth"
+    
+    while autoRebirthEnabled do
+        game:GetService("ReplicatedStorage").Common.Library.Network.RemoteFunction:InvokeServer("S_Rebirth_Request", {})
+        wait()
+    end
+end)
