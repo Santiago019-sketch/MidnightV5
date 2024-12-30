@@ -4649,18 +4649,18 @@ Name = "Credits",
 Icon = "http://www.roblox.com/asset/?id=4370318685",
 PremiumOnly = false
 })
-Tab:AddLabel("Script is made by Riotscripter, Join the discord for support")
-Tab:AddLabel("Credits to Riotscripter/Chaosscripter!")
+Tab:AddLabel("Script is made by mikee_str, Join the discord for support")
+Tab:AddLabel("Credits to Mikee_Str)
 Tab:AddButton({
 Name = "Discord",
 Callback = function()
-setclipboard("https://discord.gg/kKaZEfW7zv")
+setclipboard("https://discord.gg/nD2kXufNAU")
 end 
 })
 Tab:AddButton({
 Name = "Youtube",
 Callback = function()
-setclipboard("https://m.youtube.com/channel/UCvXEiClhdiICCgSVzkEIT3A")
+setclipboard("")
 end
 })
 Tab:AddButton({
