@@ -2,6 +2,7 @@ local gui = Instance.new("ScreenGui")
 local mainFrame = Instance.new("Frame")
 local autoFarmBtn = Instance.new("TextButton")
 local autoRebirthBtn = Instance.new("TextButton")
+local autoEggBtn = Instance.new("TextButton")  -- New button
 local title = Instance.new("TextLabel")
 
 -- GUI Setup
@@ -9,12 +10,12 @@ gui.Name = "FarmingGUI"
 gui.ResetOnSpawn = false
 gui.Parent = game.CoreGui
 
--- Main Frame
+-- Main Frame (adjusted size to accommodate new button)
 mainFrame.Name = "MainFrame"
 mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 mainFrame.BorderSizePixel = 0
 mainFrame.Position = UDim2.new(0.8, 0, 0.5, -75)
-mainFrame.Size = UDim2.new(0, 180, 0, 140)
+mainFrame.Size = UDim2.new(0, 180, 0, 190)  -- Increased height
 mainFrame.Active = true
 mainFrame.Draggable = true
 mainFrame.Parent = gui
@@ -38,7 +39,7 @@ title.Parent = mainFrame
 -- Auto Farm Button
 autoFarmBtn.Name = "AutoFarmButton"
 autoFarmBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-autoFarmBtn.Position = UDim2.new(0.1, 0, 0.3, 0)
+autoFarmBtn.Position = UDim2.new(0.1, 0, 0.25, 0)
 autoFarmBtn.Size = UDim2.new(0.8, 0, 0, 35)
 autoFarmBtn.Font = Enum.Font.GothamSemibold
 autoFarmBtn.Text = "Auto Farm"
@@ -49,13 +50,24 @@ autoFarmBtn.Parent = mainFrame
 -- Auto Rebirth Button
 autoRebirthBtn.Name = "AutoRebirthButton"
 autoRebirthBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-autoRebirthBtn.Position = UDim2.new(0.1, 0, 0.65, 0)
+autoRebirthBtn.Position = UDim2.new(0.1, 0, 0.5, 0)
 autoRebirthBtn.Size = UDim2.new(0.8, 0, 0, 35)
 autoRebirthBtn.Font = Enum.Font.GothamSemibold
 autoRebirthBtn.Text = "Auto Rebirth"
 autoRebirthBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 autoRebirthBtn.TextSize = 14
 autoRebirthBtn.Parent = mainFrame
+
+-- Auto Egg Button
+autoEggBtn.Name = "AutoEggButton"
+autoEggBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+autoEggBtn.Position = UDim2.new(0.1, 0, 0.75, 0)
+autoEggBtn.Size = UDim2.new(0.8, 0, 0, 35)
+autoEggBtn.Font = Enum.Font.GothamSemibold
+autoEggBtn.Text = "Auto Egg"
+autoEggBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+autoEggBtn.TextSize = 14
+autoEggBtn.Parent = mainFrame
 
 -- Add rounded corners to buttons
 local function addButtonCorners(button)
@@ -66,6 +78,7 @@ end
 
 addButtonCorners(autoFarmBtn)
 addButtonCorners(autoRebirthBtn)
+addButtonCorners(autoEggBtn)
 
 -- Function to simulate clicking
 local function click()
@@ -108,5 +121,25 @@ autoRebirthBtn.MouseButton1Click:Connect(function()
     while autoRebirthEnabled do
         game:GetService("ReplicatedStorage").Common.Library.Network.RemoteFunction:InvokeServer("S_Rebirth_Request", {})
         wait()
+    end
+end)
+
+-- Auto Egg Opener Functionality
+local autoEggEnabled = false
+autoEggBtn.MouseButton1Click:Connect(function()
+    autoEggEnabled = not autoEggEnabled
+    autoEggBtn.BackgroundColor3 = autoEggEnabled and Color3.fromRGB(0, 170, 127) or Color3.fromRGB(45, 45, 45)
+    autoEggBtn.Text = autoEggEnabled and "Auto Egg (ON)" or "Auto Egg"
+    
+    while autoEggEnabled do
+        local args = {
+            [1] = "S_Eggs_Open",
+            [2] = {
+                [1] = "Starter",
+                [2] = 1
+            }
+        }
+        game:GetService("ReplicatedStorage").Common.Library.Network.RemoteFunction:InvokeServer(unpack(args))
+        wait(0.1)  -- Small delay to prevent overwhelming the server
     end
 end)
